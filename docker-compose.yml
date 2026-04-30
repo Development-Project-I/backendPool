@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: gastro_user
+      POSTGRES_PASSWORD: gastro_password
+      POSTGRES_DB: gastroplan_db
+    ports:
+      - '5432:5432'
