@@ -1,20 +1,25 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'gastro_user',
-      password: 'gastro_password',
-      database: 'gastroplan_db',
-      autoLoadEntities: true, 
-      synchronize: true, 
+      url: process.env.DATABASE_URL, // URL do Neon - DB na nuvem
+      autoLoadEntities: true,
+      synchronize: true,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     }),
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
