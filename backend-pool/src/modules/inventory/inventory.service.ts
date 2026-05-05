@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { InventoryItem } from './entities/inventory-item.entity';
-// Importe os DTOs que o Nest gerou (os caminhos podem variar levemente)
+import { InventoryItem } from './entities/inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 
