@@ -2,9 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeor
 
 export enum UserRole {
   ADMIN = 'ADMIN',
-  FUNCIONARIO = 'FUNCIONARIO',
   ESTOQUISTA = 'ESTOQUISTA',
-  PROFESSOR = 'PROFESSOR',
+  PROFESSOR = 'PROFESSOR'
 }
 
 @Entity('users')
@@ -27,6 +26,6 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.FUNCIONARIO })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.PROFESSOR })
   role: UserRole;
 }
