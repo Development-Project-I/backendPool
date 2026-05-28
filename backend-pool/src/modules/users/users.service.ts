@@ -14,7 +14,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
-    const { email, matricula, password } = createUserDto;
+    const { name, email, matricula, password, role } = createUserDto;
 
     const emailExists = await this.usersRepository.findOne({ where: { email } });
     if (emailExists) {
@@ -29,8 +29,10 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = this.usersRepository.create({
+      name,
       email,
       matricula,
+      role,
       password: hashedPassword,
     });
 
@@ -38,6 +40,15 @@ export class UsersService {
 
     const { password: _, ...result } = saved;
     return result;
+  }
+  // aqui ta buscando o user pelo email ou matrícula
+  async findByIdentificador(identificador: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: [
+        { email: identificador },
+        { matricula: identificador },
+      ],
+    });
   }
 
   findAll() {

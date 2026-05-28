@@ -1,9 +1,11 @@
+import { UserRole } from '../entities/user.entity';
 import {
   IsEmail,
   IsString,
   IsNotEmpty,
   MinLength,
   Matches,
+  IsEnum
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -20,4 +22,12 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'A senha é obrigatória.' })
   @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres.' })
   password!: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'O nome é obrigatório.' })
+  name!: string;
+
+  @IsEnum(UserRole, { message: 'Cargo inválido.' })
+  @IsNotEmpty({ message: 'O cargo é obrigatório.' })
+  role!: UserRole;
 }
