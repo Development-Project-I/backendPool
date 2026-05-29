@@ -16,4 +16,13 @@ export class InventoryItem {
 
   @Column({ type: 'timestamp' })
   expiryDate: Date; // Data de Validade
+
+  @Column({ default: 'kg' })
+  unit: string; // Unidade de Medida (kg, g, l, ml, etc.)
+
+  @Column('float', { default: 0 })
+  minStock: number; // Estoque Mínimo
+
+  @Column({nullable: true})
+  batchNumber: string; // Número do Lote
 }
