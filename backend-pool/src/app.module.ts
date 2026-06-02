@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { UsersModule } from './modules/users/users.module';
+import { IngredientsModule } from './modules/ingredients/ingredients.module';
+import { AulasModule } from './modules/aulas/aulas.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
@@ -23,6 +25,8 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     InventoryModule,
     UsersModule,
+    IngredientsModule,
+    AulasModule,
     AuthModule,
   ],
   controllers: [AppController],
