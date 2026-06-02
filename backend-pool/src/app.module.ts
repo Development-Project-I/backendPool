@@ -7,6 +7,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { UsersModule } from './modules/users/users.module';
 import { IngredientsModule } from './modules/ingredients/ingredients.module';
 import { AulasModule } from './modules/aulas/aulas.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AulasModule } from './modules/aulas/aulas.module';
     UsersModule,
     IngredientsModule,
     AulasModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

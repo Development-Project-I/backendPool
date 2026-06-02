@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsNotEmpty, IsDateString, Min } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsDateString, Min, IsOptional} from 'class-validator';
 
 export class CreateInventoryDto {
   @IsString()
@@ -15,4 +15,15 @@ export class CreateInventoryDto {
 
   @IsDateString({}, { message: 'A data de validade deve estar no padrão ISO (AAAA-MM-DD)' })
   expiryDate: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'A unidade de medida é obrigatória.' })
+  unit: string;
+  
+  @IsNumber()
+  @Min(0, { message: 'O estoque mínimo não pode ser negativo' })
+  minStock: number;
+
+  @IsString()
+  batchNumber?: string;
 }
