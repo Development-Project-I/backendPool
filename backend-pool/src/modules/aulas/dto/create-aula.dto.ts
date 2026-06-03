@@ -1,26 +1,29 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsDateString,
-  IsArray,
-  IsInt,
-  ArrayNotEmpty,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateAulaDto {
+  @ApiProperty({ example: 'Confeitaria Avançada' })
   @IsString()
-  @IsNotEmpty({ message: 'O nome da aula é obrigatório. Ex: Técnicas de Panificação' })
+  @IsNotEmpty({ message: 'O nome da aula é obrigatório.' })
   name: string;
 
-  @IsDateString({}, { message: 'A data da aula deve estar no padrão ISO (AAAA-MM-DD)' })
-  date: string;
-
+  @ApiProperty({ description: 'ID do usuário professor', example: 'uuid-do-professor' })
   @IsString()
-  @IsNotEmpty({ message: 'A turma é obrigatória. Ex: Turma A' })
-  turma: string;
+  @IsNotEmpty({ message: 'O professor é obrigatório.' })
+  professorId: string;
 
-  @IsArray({ message: 'ingredientIds deve ser um array de IDs' })
-  @ArrayNotEmpty({ message: 'A aula deve ter ao menos um ingrediente' })
-  @IsInt({ each: true, message: 'Cada ingredientId deve ser um número inteiro' })
-  ingredientIds: number[];
+  @ApiProperty({ example: 'Cozinha A' })
+  @IsString()
+  @IsNotEmpty({ message: 'A cozinha é obrigatória.' })
+  kitchen: string;
+
+  @ApiProperty({ description: 'Dia da semana', example: 'Segunda' })
+  @IsString()
+  @IsNotEmpty()
+  dayOfWeek: string;
+
+  @ApiProperty({ example: '08:00' })
+  @IsString()
+  @IsNotEmpty()
+  time: string;
 }

@@ -2,10 +2,9 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
+  OneToMany,
 } from 'typeorm';
-import { Ingredient } from '../../ingredients/entities/ingredient.entity';
+import { AulaIngredient } from './aula-ingredient.entity';
 
 @Entity('aulas')
 export class Aula {
@@ -13,17 +12,23 @@ export class Aula {
   id!: number;
 
   @Column()
-  name!: string; // Ex: Técnicas de Panificação
+  name!: string;
 
-  @Column({ type: 'date' })
-  date!: string; // Data da aula (AAAA-MM-DD)
+  @Column({ default: 'sem-professor' })
+  professorId!: string;
 
-  @Column()
-  turma!: string; // Ex: Turma A
+  @Column({ default: 'Cozinha Padrão' })
+  kitchen!: string;
 
-  @ManyToMany(() => Ingredient, (ingredient) => ingredient.aulas, {
+  @Column({ default: 'Segunda' })
+  dayOfWeek!: string;
+
+  @Column({ default: '00:00' })
+  time!: string;
+
+  @OneToMany(() => AulaIngredient, (aulaIngredient) => aulaIngredient.aula, {
+    cascade: true,
     eager: true,
   })
-  @JoinTable({ name: 'aulas_ingredients' })
-  ingredients!: Ingredient[];
+  aulaIngredients!: AulaIngredient[];
 }

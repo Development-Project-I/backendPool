@@ -1,46 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Aula } from './entities/aula.entity';
-import { Ingredient } from '../ingredients/entities/ingredient.entity';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
+import { AulaIngredient } from './entities/aula-ingredient.entity';
+import { CreateIngredientDto } from '../ingredients/dto/create-ingredient.dto';
 
 @Injectable()
 export class AulasService {
   constructor(
     @InjectRepository(Aula)
     private aulasRepository: Repository<Aula>,
-    @InjectRepository(Ingredient)
-    private ingredientsRepository: Repository<Ingredient>,
+    
+    @InjectRepository(AulaIngredient)
+    private aulaIngredientRepository: Repository<AulaIngredient>,
   ) {}
 
-  private async resolveIngredients(ids: number[]): Promise<Ingredient[]> {
-    const ingredients = await this.ingredientsRepository.findBy({ id: In(ids) });
-
-    const foundIds = ingredients.map((i) => i.id);
-    const missing = ids.filter((id) => !foundIds.includes(id));
-    if (missing.length > 0) {
-      throw new NotFoundException(
-        `Ingredientes com IDs [${missing.join(', ')}] não encontrados.`,
-      );
-    }
-
-    return ingredients;
+  // CREATE AULA
+  async create(createAulaDto: CreateAulaDto) {
+    const aula = this.aulasRepository.create(createAulaDto);
+    return await this.aulasRepository.save(aula);
   }
 
-  // CREATE
-  async create(createAulaDto: CreateAulaDto) {
-    const { ingredientIds, ...rest } = createAulaDto;
-    const ingredients = await this.resolveIngredients(ingredientIds);
+  // aqui ta vinculando o ingrediente a aula
+  async addIngredient(aulaId: number, createIngredientDto: CreateIngredientDto) {
+    const aula = await this.findOne(aulaId);
 
-    const aula = this.aulasRepository.create({ ...rest, ingredients });
-    return await this.aulasRepository.save(aula);
+    const novoVinculo = this.aulaIngredientRepository.create({
+      aula: { id: aula.id }, 
+      inventoryItem: { id: createIngredientDto.itemId }, 
+      quantity: createIngredientDto.quantity,
+      unit: createIngredientDto.unit
+    });
+
+    return await this.aulaIngredientRepository.save(novoVinculo);
   }
 
   // READ all
   async findAll() {
-    return await this.aulasRepository.find({ order: { date: 'ASC' } });
+    return await this.aulasRepository.find({ order: { name: 'ASC' } });
   }
 
   // READ por id
@@ -55,14 +54,7 @@ export class AulasService {
   // UPDATE
   async update(id: number, updateAulaDto: UpdateAulaDto) {
     const aula = await this.findOne(id);
-    const { ingredientIds, ...rest } = updateAulaDto;
-
-    this.aulasRepository.merge(aula, rest);
-
-    if (ingredientIds) {
-      aula.ingredients = await this.resolveIngredients(ingredientIds);
-    }
-
+    this.aulasRepository.merge(aula, updateAulaDto);
     return await this.aulasRepository.save(aula);
   }
 

@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
-import { Aula } from '../../aulas/entities/aula.entity';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('ingredients')
 export class Ingredient {
@@ -14,7 +13,4 @@ export class Ingredient {
 
   @Column()
   category!: string; // Ex: Farináceos, Laticínios
-
-  @ManyToMany(() => Aula, (aula) => aula.ingredients)
-  aulas!: Aula[];
 }

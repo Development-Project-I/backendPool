@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AulasService } from './aulas.service';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
+import { CreateIngredientDto } from '../ingredients/dto/create-ingredient.dto';
 
 @Controller('aulas')
 export class AulasController {
@@ -10,6 +11,14 @@ export class AulasController {
   @Post()
   create(@Body() createAulaDto: CreateAulaDto) {
     return this.aulasService.create(createAulaDto);
+  }
+
+  @Post(':id/ingredientes')
+  addIngredient(
+    @Param('id') id: string,
+    @Body() createIngredientDto: CreateIngredientDto,
+  ) {
+    return this.aulasService.addIngredient(+id, createIngredientDto);
   }
 
   @Get()

@@ -1,15 +1,19 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsNumber, Min } from 'class-validator';
 
 export class CreateIngredientDto {
-  @IsString()
-  @IsNotEmpty({ message: 'O nome do ingrediente é obrigatório. Ex: Farinha de Trigo' })
-  name: string;
+  @ApiProperty({ description: 'ID numérico do item buscado no estoque', example: 1 })
+  @IsNumber({}, { message: 'O ID do item deve ser um número.' })
+  @IsNotEmpty({ message: 'O item do estoque é obrigatório.' })
+  itemId: number;
 
+  @ApiProperty({ description: 'Quantidade necessária para a aula', example: 2.5 })
+  @IsNumber({}, { message: 'A quantidade deve ser um número válido.' })
+  @Min(0.1, { message: 'A quantidade deve ser maior que zero.' })
+  quantity: number;
+
+  @ApiProperty({ example: 'unidade' })
   @IsString()
   @IsNotEmpty({ message: 'A unidade de medida é obrigatória. Ex: kg, L, g, ml, unidade' })
   unit: string;
-
-  @IsString()
-  @IsNotEmpty({ message: 'A categoria é obrigatória. Ex: Farináceos, Laticínios' })
-  category: string;
 }

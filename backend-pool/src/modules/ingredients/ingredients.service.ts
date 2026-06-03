@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Ingredient } from './entities/ingredient.entity';
@@ -14,18 +14,8 @@ export class IngredientsService {
 
   // CREATE
   async create(createIngredientDto: CreateIngredientDto) {
-    const existing = await this.ingredientsRepository.findOne({
-      where: { name: createIngredientDto.name },
-    });
-
-    if (existing) {
-      throw new ConflictException(
-        `Ingrediente "${createIngredientDto.name}" já está cadastrado.`,
-      );
-    }
-
-    const newIngredient = this.ingredientsRepository.create(createIngredientDto);
-    return await this.ingredientsRepository.save(newIngredient);
+    const ingredient = this.ingredientsRepository.create(createIngredientDto);
+    return await this.ingredientsRepository.save(ingredient);
   }
 
   // READ all
