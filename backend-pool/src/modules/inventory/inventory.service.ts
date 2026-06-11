@@ -1,18 +1,15 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InventoryItem } from './entities/inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
-import { AulaIngredient } from '../aulas/entities/aula-ingredient.entity';
 
 @Injectable()
 export class InventoryService {
   constructor(
     @InjectRepository(InventoryItem)
     private inventoryRepository: Repository<InventoryItem>,
-    @InjectRepository(AulaIngredient)
-    private aulaIngredientRepository: Repository<AulaIngredient>,
   ) {}
 
   // CREATE
@@ -63,20 +60,6 @@ export class InventoryService {
   // DELETE
   async remove(id: number) {
     const item = await this.findOne(id);
-
-    const vinculoExistente = await this.aulaIngredientRepository.findOne({
-      where: {
-        inventoryItem: { id: item.id }
-      },
-      relations: ['aula'] 
-    });
-
-    if (vinculoExistente) {
-      throw new ConflictException(
-        `Este ingrediente não pode ser excluído, porque a 'Aula — ${vinculoExistente.aula.name}' está requisitando-o.`
-      );
-    }
-
     return await this.inventoryRepository.remove(item);
   }
 }
