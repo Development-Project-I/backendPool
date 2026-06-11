@@ -15,11 +15,11 @@ export class Aula {
   @Column()
   name!: string; // Ex: Técnicas de Panificação
 
-  @Column({ type: 'date' })
-  date!: string; // Data da aula (AAAA-MM-DD)
+  @Column({ type: 'date', default: '2026-01-01' }) // Preenche o passado com uma data padrão
+  date!: string;
 
-  @Column()
-  turma!: string; // Ex: Turma A
+  @Column({ type: 'character varying', default: 'Turma Geral' }) // Preenche o passado com um texto padrão
+  turma!: string;
 
   @ManyToMany(() => Ingredient, (ingredient) => ingredient.aulas, {
     eager: true,
