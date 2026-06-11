@@ -4,12 +4,16 @@ import { Repository } from 'typeorm';
 import { Ingredient } from './entities/ingredient.entity';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
+import { AulaIngredient } from '../aulas/entities/aula-ingredient.entity';
 
 @Injectable()
 export class IngredientsService {
   constructor(
     @InjectRepository(Ingredient)
     private ingredientsRepository: Repository<Ingredient>,
+
+    @InjectRepository(AulaIngredient)
+    private aulaIngredientRepository: Repository<AulaIngredient>,
   ) {}
 
   // CREATE
@@ -39,9 +43,13 @@ export class IngredientsService {
     return await this.ingredientsRepository.save(ingredient);
   }
 
-  // DELETE
-  async remove(id: number) {
-    const ingredient = await this.findOne(id);
-    return await this.ingredientsRepository.remove(ingredient);
+  // DELETE — remove o vínculo aula↔ingrediente (aula_ingredients)
+  async remove(id: number): Promise<{ message: string; ingredientId: number }> {
+    const aulaIngredient = await this.aulaIngredientRepository.findOne({ where: { id } });
+    if (!aulaIngredient) {
+      throw new NotFoundException(`Ingrediente com ID ${id} não encontrado.`);
+    }
+    await this.aulaIngredientRepository.remove(aulaIngredient);
+    return { message: 'Ingrediente removido da aula.', ingredientId: id };
   }
 }
