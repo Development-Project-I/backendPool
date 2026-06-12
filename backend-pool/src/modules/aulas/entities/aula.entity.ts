@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
+  ManyToOne,
 } from 'typeorm';
 import { Ingredient } from '../../ingredients/entities/ingredient.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('aulas')
 export class Aula {
@@ -20,6 +22,13 @@ export class Aula {
 
   @Column()
   turma!: string; // Ex: Turma A
+
+  @Column()
+  professorId!: number;
+
+  @ManyToOne(() => User)
+  professor!: User;
+  // ----------------------------------------------------
 
   @ManyToMany(() => Ingredient, (ingredient) => ingredient.aulas, {
     eager: true,

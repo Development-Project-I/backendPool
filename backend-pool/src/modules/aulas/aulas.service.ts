@@ -5,6 +5,8 @@ import { Aula } from './entities/aula.entity';
 import { Ingredient } from '../ingredients/entities/ingredient.entity';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
+import { User, UserRole } from '../users/entities/user.entity';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class AulasService {
@@ -13,7 +15,23 @@ export class AulasService {
     private aulasRepository: Repository<Aula>,
     @InjectRepository(Ingredient)
     private ingredientsRepository: Repository<Ingredient>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
   ) {}
+
+  private async validateProfessor(professorId: number): Promise<void> {
+    const user = await this.usersRepository.findOne({ where: { id: professorId } });
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${professorId} (professorId) não encontrado.`);
+    }
+
+    if (user.role !== UserRole.PROFESSOR) {
+      throw new BadRequestException(
+        `O usuário "${user.name}" não possui permissão de PROFESSOR (Role atual: ${user.role}).`,
+      );
+    }
+  }
 
   private async resolveIngredients(ids: number[]): Promise<Ingredient[]> {
     const ingredients = await this.ingredientsRepository.findBy({ id: In(ids) });
@@ -31,10 +49,13 @@ export class AulasService {
 
   // CREATE
   async create(createAulaDto: CreateAulaDto) {
-    const { ingredientIds, ...rest } = createAulaDto;
+    const { ingredientIds, professorId, ...rest } = createAulaDto;
+
+    await this.validateProfessor(professorId);
+
     const ingredients = await this.resolveIngredients(ingredientIds);
 
-    const aula = this.aulasRepository.create({ ...rest, ingredients });
+    const aula = this.aulasRepository.create({ ...rest, professorId, ingredients });
     return await this.aulasRepository.save(aula);
   }
 
@@ -55,7 +76,13 @@ export class AulasService {
   // UPDATE
   async update(id: number, updateAulaDto: UpdateAulaDto) {
     const aula = await this.findOne(id);
-    const { ingredientIds, ...rest } = updateAulaDto;
+    const { ingredientIds, professorId, ...rest } = updateAulaDto;
+
+    // CRITÉRIO DE ACEITE: Se o professorId foi enviado no PATCH, valida a existência e a role
+    if (professorId) {
+      await this.validateProfessor(professorId);
+      aula.professorId = professorId;
+    }
 
     this.aulasRepository.merge(aula, rest);
 
