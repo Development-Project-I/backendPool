@@ -30,12 +30,45 @@ export class IngredientsService {
 
   // READ all
   async findAll() {
-    return await this.ingredientsRepository.find({ order: { name: 'ASC' } });
+    // CORREÇÃO: Seleciona o ingrediente trazendo apenas as colunas seguras da Aula (evita quebrar por date/turma inexistentes)
+    return await this.ingredientsRepository.find({
+      relations: {
+        aulas: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        unit: true,
+        category: true,
+        aulas: {
+          id: true,
+          name: true,
+        },
+      },
+      order: { name: 'ASC' },
+    });
   }
 
   // READ por id
   async findOne(id: number) {
-    const ingredient = await this.ingredientsRepository.findOne({ where: { id } });
+    // CORREÇÃO: Busca o ingrediente específico mapeando estritamente os campos físicos existentes
+    const ingredient = await this.ingredientsRepository.findOne({
+      where: { id },
+      relations: {
+        aulas: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        unit: true,
+        category: true,
+        aulas: {
+          id: true,
+          name: true,
+        },
+      },
+    });
+
     if (!ingredient) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado.`);
     }
