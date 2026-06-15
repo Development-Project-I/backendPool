@@ -22,14 +22,11 @@ export class Aula {
   @Column()
   name!: string;
 
-  @Column({ default: 'sem-professor' })
-  professorId!: string;
+  @Column({ type: 'date', default: '2026-01-01' }) // Preenche o passado com uma data padrão
+  date!: string;
 
-  @Column({ default: 'Cozinha Padrão' })
-  kitchen!: string;
-
-  @Column({ default: 'Segunda' })
-  dayOfWeek!: string;
+  @Column({ type: 'character varying', default: 'Turma Geral' }) // Preenche o passado com um texto padrão
+  turma!: string;
 
   @Column({ default: '00:00' })
   time!: string;
