@@ -1,41 +1,38 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Ingredient } from './entities/ingredient.entity';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
+import { AulaIngredient } from '../aulas/entities/aula-ingredient.entity';
 
 @Injectable()
 export class IngredientsService {
   constructor(
     @InjectRepository(Ingredient)
     private ingredientsRepository: Repository<Ingredient>,
+    @InjectRepository(AulaIngredient)
+    private aulaIngredientRepository: Repository<AulaIngredient>,
   ) {}
 
   // CREATE
   async create(createIngredientDto: CreateIngredientDto) {
-    const existing = await this.ingredientsRepository.findOne({
-      where: { name: createIngredientDto.name },
-    });
-
-    if (existing) {
-      throw new ConflictException(
-        `Ingrediente "${createIngredientDto.name}" já está cadastrado.`,
-      );
-    }
-
-    const newIngredient = this.ingredientsRepository.create(createIngredientDto);
-    return await this.ingredientsRepository.save(newIngredient);
+    const ingredient = this.ingredientsRepository.create(createIngredientDto);
+    return await this.ingredientsRepository.save(ingredient);
   }
 
   // READ all
   async findAll() {
-    return await this.ingredientsRepository.find({ order: { name: 'ASC' } });
+    return await this.ingredientsRepository.find({
+      order: { name: 'ASC' },
+    });
   }
 
   // READ por id
   async findOne(id: number) {
-    const ingredient = await this.ingredientsRepository.findOne({ where: { id } });
+    const ingredient = await this.ingredientsRepository.findOne({
+      where: { id },
+    });
     if (!ingredient) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado.`);
     }
@@ -49,9 +46,25 @@ export class IngredientsService {
     return await this.ingredientsRepository.save(ingredient);
   }
 
-  // DELETE
-  async remove(id: number) {
-    const ingredient = await this.findOne(id);
-    return await this.ingredientsRepository.remove(ingredient);
+  // DELETE — remove o ingrediente, bloqueando se estiver vinculado a alguma aula
+  async remove(id: number): Promise<{ message: string; ingredientId: number }> {
+    const ingredient = await this.ingredientsRepository.findOne({ where: { id } });
+    if (!ingredient) {
+      throw new NotFoundException(`Ingrediente com ID ${id} não encontrado.`);
+    }
+
+    const vinculo = await this.aulaIngredientRepository.findOne({
+      where: { itemId: id },
+      relations: ['aula'],
+    });
+
+    if (vinculo) {
+      throw new ConflictException(
+        `Este ingrediente não pode ser excluído porque a aula "${vinculo.aula.name}" está requisitando-o.`,
+      );
+    }
+
+    await this.ingredientsRepository.remove(ingredient);
+    return { message: 'Ingrediente removido com sucesso.', ingredientId: id };
   }
 }
