@@ -11,7 +11,6 @@ export class IngredientsService {
   constructor(
     @InjectRepository(Ingredient)
     private ingredientsRepository: Repository<Ingredient>,
-
     @InjectRepository(AulaIngredient)
     private aulaIngredientRepository: Repository<AulaIngredient>,
   ) {}
@@ -24,7 +23,9 @@ export class IngredientsService {
 
   // READ all
   async findAll() {
-    return await this.ingredientsRepository.find({ order: { name: 'ASC' } });
+    return await this.ingredientsRepository.find({
+      order: { name: 'ASC' },
+    });
   }
 
   // READ por id

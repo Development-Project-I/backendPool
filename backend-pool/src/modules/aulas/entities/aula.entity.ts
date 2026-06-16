@@ -22,6 +22,12 @@ export class Aula {
   @Column()
   name!: string;
 
+  @Column({ type: 'date', default: '2026-01-01' })
+  date!: string;
+
+  @Column({ type: 'character varying', default: 'Turma Geral' })
+  turma!: string;
+
   @Column({ default: 'sem-professor' })
   professorId!: string;
 
