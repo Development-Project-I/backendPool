@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Ingredient } from './entities/ingredient.entity';
@@ -30,7 +30,9 @@ export class IngredientsService {
 
   // READ por id
   async findOne(id: number) {
-    const ingredient = await this.ingredientsRepository.findOne({ where: { id } });
+    const ingredient = await this.ingredientsRepository.findOne({
+      where: { id },
+    });
     if (!ingredient) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado.`);
     }
@@ -44,13 +46,25 @@ export class IngredientsService {
     return await this.ingredientsRepository.save(ingredient);
   }
 
-  // DELETE — remove o vínculo aula↔ingrediente (aula_ingredients)
+  // DELETE — remove o ingrediente, bloqueando se estiver vinculado a alguma aula
   async remove(id: number): Promise<{ message: string; ingredientId: number }> {
-    const aulaIngredient = await this.aulaIngredientRepository.findOne({ where: { id } });
-    if (!aulaIngredient) {
+    const ingredient = await this.ingredientsRepository.findOne({ where: { id } });
+    if (!ingredient) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado.`);
     }
-    await this.aulaIngredientRepository.remove(aulaIngredient);
-    return { message: 'Ingrediente removido da aula.', ingredientId: id };
+
+    const vinculo = await this.aulaIngredientRepository.findOne({
+      where: { itemId: id },
+      relations: ['aula'],
+    });
+
+    if (vinculo) {
+      throw new ConflictException(
+        `Este ingrediente não pode ser excluído porque a aula "${vinculo.aula.name}" está requisitando-o.`,
+      );
+    }
+
+    await this.ingredientsRepository.remove(ingredient);
+    return { message: 'Ingrediente removido com sucesso.', ingredientId: id };
   }
 }

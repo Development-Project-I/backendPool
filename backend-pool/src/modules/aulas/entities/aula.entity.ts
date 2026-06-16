@@ -36,7 +36,7 @@ export class Aula {
 
   @Column({ default: 'Segunda' })
   dayOfWeek!: string;
-
+  
   @Column({ default: '00:00' })
   time!: string;
 
