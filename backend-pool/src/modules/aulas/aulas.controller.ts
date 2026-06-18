@@ -4,7 +4,6 @@ import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
 import { CreateIngredientDto } from '../ingredients/dto/create-ingredient.dto';
 
-@ApiTags('Aulas')
 @Controller('aulas')
 export class AulasController {
   constructor(private readonly aulasService: AulasService) {}
@@ -23,25 +22,11 @@ export class AulasController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar todas as aulas registradas' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Retorna um array contendo todas as aulas com o schema ApiAula e itens de inventário.',
-    type: [ApiAulaResponseDto] 
-  })
   findAll() {
     return this.aulasService.findAll();
   }
 
-  
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar os detalhes de uma aula específica por ID' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Aula encontrada e contratos carregados com sucesso.',
-    type: ApiAulaResponseDto
-  })
-  @ApiResponse({ status: 404, description: 'Aula não encontrada no banco de dados.' })
   findOne(@Param('id') id: string) {
     return this.aulasService.findOne(+id);
   }

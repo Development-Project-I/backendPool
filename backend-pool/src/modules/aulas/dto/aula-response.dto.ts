@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// Schema: AulaInventoryItem (Exigido no Critério de Aceite 2)
 export class AulaInventoryItem {
   @ApiProperty({ example: 1, description: 'ID do ingrediente no inventário' })
   id!: number;
