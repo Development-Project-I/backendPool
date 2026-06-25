@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InventoryItem } from './entities/inventory.entity';
@@ -14,6 +14,24 @@ export class InventoryService {
 
   // CREATE
   async create(createInventoryDto: CreateInventoryDto) {
+    const expiryDate = new Date(createInventoryDto.expiryDate);
+    if (isNaN(expiryDate.getTime())) {
+      throw new BadRequestException('expiryDate inválida');
+    }
+
+    const itemDuplicado = await this.inventoryRepository.findOne({ //aqui ta busancado por nome e validade, caso exista um item com o mesmo nome e validade, vai lançar uma exceção de conflito
+      where: {
+        name: createInventoryDto.name,
+        expiryDate: expiryDate,
+      },
+    });
+
+    if (itemDuplicado) {
+      throw new ConflictException(
+        `O item '${createInventoryDto.name}' com validade para '${createInventoryDto.expiryDate}' já está registrado no estoque.`
+      );
+    }
+
     const newItem = this.inventoryRepository.create(createInventoryDto);
     return await this.inventoryRepository.save(newItem);
   }
