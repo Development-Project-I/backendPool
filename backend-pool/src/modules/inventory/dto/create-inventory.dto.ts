@@ -26,13 +26,8 @@ export class CreateInventoryDto {
   @IsNotEmpty({ message: 'A unidade de medida é obrigatória.' })
   unit: string;
   
-  @ApiProperty({ example: 5 })
-  @IsNumber()
-  @Min(0, { message: 'O estoque mínimo não pode ser negativo' })
-  minStock: number;
-
-  @ApiProperty({ required: false, example: 'FT2026-045' })
+  @ApiProperty({ example: 0, required: false })
   @IsOptional()
-  @IsString()
-  batchNumber?: string;
-}
+  @IsNumber()
+  @Min(0)
+  minStock?: number = 0;
