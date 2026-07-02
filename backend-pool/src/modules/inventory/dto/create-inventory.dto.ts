@@ -31,3 +31,4 @@ export class CreateInventoryDto {
   @IsNumber()
   @Min(0)
   minStock?: number = 0;
+}
